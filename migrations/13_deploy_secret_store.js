@@ -1,6 +1,6 @@
 /* global artifacts */
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
-const AccessConditions = artifacts.require('AccessConditions.sol')
+const AccessConditions = artifacts.require('SecretStore.sol')
 const { saveDefinition } = require('./helper')
 
 const serviceAgreement = async (deployer, network) => {

@@ -1,11 +1,11 @@
 /* global artifacts, contract, before, describe, it */
 /* eslint-disable no-console, max-len */
 
-const OceanToken = artifacts.require('OceanToken.sol')
-const OceanMarket = artifacts.require('OceanMarket.sol')
+const OceanToken = artifacts.require('OCNToken.sol')
+const OceanMarket = artifacts.require('Market.sol')
 const SLA = artifacts.require('ServiceAgreement.sol')
-const PaymentCtrl = artifacts.require('PaymentConditions.sol')
-const AccessCtrl = artifacts.require('AccessConditions.sol')
+const PaymentCtrl = artifacts.require('Payments.sol')
+const AccessCtrl = artifacts.require('SecretStore.sol')
 const testUtils = require('./utils')
 
 const Web3 = require('web3')

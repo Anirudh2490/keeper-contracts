@@ -1,8 +1,8 @@
 /* global assert, artifacts, contract, before, describe, it */
 
-const AccessConditions = artifacts.require('AccessConditions.sol')
-const OceanToken = artifacts.require('OceanToken.sol')
-const PaymentConditions = artifacts.require('PaymentConditions.sol')
+const AccessConditions = artifacts.require('SecretStore.sol')
+const OceanToken = artifacts.require('OCNToken.sol')
+const PaymentConditions = artifacts.require('Payments.sol')
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 
 const utils = require('./utils.js')

@@ -1,17 +1,17 @@
 pragma solidity 0.4.25;
 
-import '../OceanMarket.sol';
+import './Market.sol';
 
 /**
 @title Ocean Protocol Authorization Contract
 @author Team: Fang Gong, Ahmed Ali, Sebastian Gerske, Samer Sallam
 */
-contract OceanAuth {
+contract Jwt {
 
     // ============
     // DATA STRUCTURES:
     // ============
-    OceanMarket private market;
+    Market private market;
 
     // Sevice level agreement published on immutable storage
     struct AccessAgreement {
@@ -93,7 +93,7 @@ contract OceanAuth {
     constructor(address _marketAddress) public {
         require(_marketAddress != address(0), 'Market address cannot be 0x0');
         // instance of Market
-        market = OceanMarket(_marketAddress);
+        market = Market(_marketAddress);
         // add auth contract to access list in market contract - function in market contract
         market.addAuthAddress();
     }

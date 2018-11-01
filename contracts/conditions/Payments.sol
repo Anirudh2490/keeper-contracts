@@ -2,10 +2,10 @@ pragma solidity 0.4.25;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 
-import '../token/OceanToken.sol';
-import './ServiceAgreement.sol';
+import '../token/OCNToken.sol';
+import '../sla/ServiceAgreement.sol';
 
-contract PaymentConditions {
+contract Payments {
 
     struct Payment {
         address sender;
@@ -21,7 +21,7 @@ contract PaymentConditions {
         require(_tokenAddress != address(0), 'invalid token address');
 
         serviceAgreementStorage = ServiceAgreement(_serviceAgreementAddress);
-        token = OceanToken(_tokenAddress);
+        token = OCNToken(_tokenAddress);
     }
 
     mapping(bytes32 => Payment) private payments;
