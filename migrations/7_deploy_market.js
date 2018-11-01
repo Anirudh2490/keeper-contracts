@@ -1,17 +1,17 @@
 /* global artifacts */
-const OceanToken = artifacts.require('OCNToken.sol')
-const OceanMarket = artifacts.require('Market.sol')
+const OCNToken = artifacts.require('OCNToken.sol')
+const Market = artifacts.require('Market.sol')
 const { saveDefinition } = require('./helper')
 
-const oceanMarket = async (deployer, network) => {
-    const tokenAddress = OceanToken.address
+const market = async (deployer, network) => {
+    const tokenAddress = OCNToken.address
 
     await deployer.deploy(
-        OceanMarket,
+        Market,
         tokenAddress
     )
 
     saveDefinition(network, OceanMarket)
 }
 
-module.exports = oceanMarket
+module.exports = market

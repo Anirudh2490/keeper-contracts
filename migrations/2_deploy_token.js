@@ -1,10 +1,10 @@
 /* global artifacts */
-const OceanToken = artifacts.require('OCNToken.sol')
+const OCNToken = artifacts.require('OCNToken.sol')
 const { saveDefinition } = require('./helper')
 
-const oceanToken = async (deployer, network) => {
+const ocnToken = async (deployer, network) => {
     await deployer.deploy(OceanToken)
-    saveDefinition(network, OceanToken)
+    saveDefinition(network, OCNToken)
 }
 
-module.exports = oceanToken
+module.exports = ocnToken
