@@ -1,9 +1,9 @@
 pragma solidity 0.4.25;
 
-import './ServiceAgreement.sol';
+import '../sla/ServiceAgreement.sol';
 
 
-contract AccessConditions{
+contract SecretStore {
 
     mapping(bytes32 => mapping(address => bool)) private assetPermissions;
 

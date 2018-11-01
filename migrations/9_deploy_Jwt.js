@@ -1,6 +1,6 @@
 /* global artifacts */
-const OceanMarket = artifacts.require('OceanMarket.sol')
-const OceanAuth = artifacts.require('OceanAuth.sol')
+const OceanMarket = artifacts.require('Market.sol')
+const OceanAuth = artifacts.require('Jwt.sol')
 const { saveDefinition } = require('./helper')
 
 const oceanAuth = async (deployer, network) => {

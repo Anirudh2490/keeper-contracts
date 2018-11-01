@@ -8,7 +8,7 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 @author Team: Fang Gong
 */
 
-contract OceanToken is ERC20 {
+contract OCNToken is ERC20 {
 
     using SafeMath for uint256;
 

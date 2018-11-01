@@ -3,14 +3,14 @@ pragma solidity 0.4.25;
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
-import './token/OceanToken.sol';
+import '../token/OCNToken.sol';
 
 /**
 @title Ocean Protocol Marketplace Contract
 @author Team: Fang Gong, Samer Sallam, Ahmed Ali, Sebastian Gerske
 */
 
-contract OceanMarket is Ownable {
+contract Market is Ownable {
 
     using SafeMath for uint256;
     using SafeMath for uint;
@@ -46,7 +46,7 @@ contract OceanMarket is Ownable {
     address private authAddress;
 
     // marketplace global variables
-    OceanToken  public  mToken;
+    OCNToken  public  mToken;
 
     // ============
     // EVENTS:
@@ -86,7 +86,7 @@ contract OceanMarket is Ownable {
     constructor(address _tokenAddress) public {
         require(_tokenAddress != address(0x0), 'Token address is 0x0.');
         // instantiate Ocean token contract
-        mToken = OceanToken(_tokenAddress);
+        mToken = OCNToken(_tokenAddress);
         // set the token receiver to be marketplace
         mToken.setReceiver(address(this));
     }

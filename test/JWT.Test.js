@@ -1,9 +1,9 @@
 /* global artifacts, assert, contract, describe, it */
 /* eslint-disable no-console, max-len */
 
-const OceanToken = artifacts.require('OceanToken.sol')
-const OceanMarket = artifacts.require('OceanMarket.sol')
-const OceanAuth = artifacts.require('OceanAuth.sol')
+const OceanToken = artifacts.require('OCNToken.sol')
+const OceanMarket = artifacts.require('Market.sol')
+const OceanAuth = artifacts.require('Jwt.sol')
 
 const ursa = require('ursa')
 const ethers = require('ethers')
@@ -12,7 +12,7 @@ const Web3 = require('web3')
 
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 
-contract('OceanAuth', (accounts) => {
+contract('Jwt', (accounts) => {
     describe('Test On-chain Authorization', () => {
         // support upto 50 assets and providers; each asset has one single provider at this time
         it('Should walk through Authorization Process', async () => {
