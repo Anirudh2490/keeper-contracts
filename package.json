@@ -1,6 +1,6 @@
 {
   "name": "@oceanprotocol/keeper-contracts",
-  "version": "0.3.3",
+  "version": "0.3.7",
   "description": "Integration of TCRs, CPM and Ocean Tokens in Solidity",
   "bugs": {
     "url": "https://github.com/oceanprotocol/keeper-contracts/issues"
@@ -11,12 +11,13 @@
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "migrate:poa": "npm run migrate -- --network ocean_poa_net_local",
+    "migrate:aws": "npm run migrate -- --network ocean_poa_aws",
     "migrate:kovan": "npm run migrate -- --network kovan",
     "migrate:rinkeby": "npm run migrate -- --network rinkeby",
     "migrate:mainnet": "npm run migrate ----network mainnet",
     "test": "truffle test",
     "test:cover": "solidity-coverage",
-    "release": "release-it patch -n",
+    "release": "./bumpversion.sh patch",
     "clean": "rm -rf ./build/ && rm -rf ./artifacts/*.development.json",
     "lint": "npm run lint:eslint && npm run lint:solium",
     "lint:eslint": "eslint --ignore-pattern '/coverage/' .",
@@ -47,6 +48,7 @@
     "eslint": "^5.8.0",
     "eslint-config-oceanprotocol": "^1.3.0",
     "eslint-plugin-node": "^8.0.0",
+    "eslint-plugin-standard": "^4.0.0",
     "ethereumjs-abi": "^0.6.5",
     "ethers": "^4.0.7",
     "ethjs": "^0.4.0",

@@ -13,9 +13,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
 
 contract('ServiceAgreement', (accounts) => {
     describe('Test On-chain Authorization', () => {
-        let token, market, sla, paymentConditions, accessConditions, resourceId, valuesHashList, signature, serviceId, conditionKeys, templateId
-        const DID = '0x315f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
-        const serviceDefinitionId = '0x515f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b894'
+        let token, market, sla, paymentConditions, accessConditions, resourceId, valuesHashList, serviceId, conditionKeys, templateId
 
         let funcFingerPrints, contracts
         const provider = accounts[0]
@@ -27,6 +25,7 @@ contract('ServiceAgreement', (accounts) => {
         const serviceName = resourceName
         let timeouts = [0, 0, 0, 3]
         const dependencies = [0, 1, 4, 1 | 2 ** 4 | 2 ** 5] // dependency bit | timeout bit
+        const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
         before(async () => {
             token = await OceanToken.new()
             // await token.setReceiver(consumer)
@@ -40,7 +39,7 @@ contract('ServiceAgreement', (accounts) => {
             await market.requestTokens(testUtils.toBigNumber(1000), fromConsumer)
             const bal = await token.balanceOf.call(consumer)
             console.log(`consumer has balance := ${bal.valueOf()} now`)
-            resourceId = await market.generateId(resourceName, fromProvider)
+            resourceId = did
             console.log('publisher registers asset with id = ', resourceId)
             contracts = [paymentConditions.address, accessConditions.address, paymentConditions.address, paymentConditions.address]
             funcFingerPrints = [
@@ -66,18 +65,19 @@ contract('ServiceAgreement', (accounts) => {
             // console.log('templateid: ', templateId)
             conditionKeys = testUtils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
             console.log('conditions: ', conditionKeys)
-            const slaMsgHash = testUtils.createSLAHash(
-                web3, templateId, conditionKeys,
-                valuesHashList, timeouts,
-                serviceDefinitionId,
-                DID
-            )
-            signature = await web3.eth.sign(slaMsgHash, consumer)
         })
 
         it('Consume asset happy path', async () => {
+            const serviceAgreementId = testUtils.generateId(web3)
+            const slaMsgHash = testUtils.createSLAHash(
+                web3, templateId, conditionKeys,
+                valuesHashList, timeouts,
+                serviceAgreementId
+            )
+            const signature = await web3.eth.sign(slaMsgHash, consumer)
+
             serviceId = await testUtils.signAgreement(
-                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceDefinitionId, DID, fromProvider
+                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceAgreementId, did, fromProvider
             )
             await token.approve(paymentConditions.address, testUtils.toBigNumber(200), fromConsumer)
             const payTx = await paymentConditions.lockPayment(serviceId, resourceId, resourcePrice, fromConsumer)
@@ -108,8 +108,16 @@ contract('ServiceAgreement', (accounts) => {
         })
 
         it('Consume asset with Refund', async () => {
+            const serviceAgreementId = testUtils.generateId(web3)
+            const slaMsgHash = testUtils.createSLAHash(
+                web3, templateId, conditionKeys,
+                valuesHashList, timeouts,
+                serviceAgreementId
+            )
+            const signature = await web3.eth.sign(slaMsgHash, consumer)
+
             serviceId = await testUtils.signAgreement(
-                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceDefinitionId, DID, fromProvider
+                sla, templateId, signature, consumer, valuesHashList, timeouts, serviceAgreementId, did, fromProvider
             )
             try {
                 await paymentConditions.refundPayment(serviceId, resourceId, resourcePrice, fromConsumer)

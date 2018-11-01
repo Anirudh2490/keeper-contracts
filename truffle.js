@@ -25,6 +25,13 @@ module.exports = {
             gas: 6000000,
             from: '0x00bd138abd70e2f00903268f3db08f2d25677c9e'
         },
+        ocean_poa_aws: {
+            host: '52.1.94.55',
+            port: 8545,
+            network_id: '*',
+            gas: 6000000,
+            from: '0x64137aF0104d2c96C44bb04AC06f09eC84CC5Ae4'
+        },
         kovan: {
             provider: () => new HDWalletProvider(nmemoric, `https://kovan.infura.io/v2/${process.env.INFURA_TOKEN}`),
             network_id: '42'

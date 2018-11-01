@@ -253,7 +253,7 @@ await auth.verifyAccessTokenDelivery(accessId, accounts[1], fixedMsgSha, sig.v, 
 
 ## New Version
 
-The `bumpversion.sh` script helps to bump the project version. You can execute the script using as first argument {major|minor|patch} to bump accordingly the version.
+The `bumpversion.sh` script helps to bump the project version. You can execute the script using as first argument {major|minor|patch} to bump accordingly the version. Also you can provide the option `--tag` to automatically create the version tag.
 
 ## Contributing
 

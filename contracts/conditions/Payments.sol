@@ -46,7 +46,7 @@ contract Payments {
     );
 
     function lockPayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
-        require(serviceAgreementStorage.getServiceAgreementConsumer(serviceId) == msg.sender, 'Only consumer can trigger releasePayment.');
+        require(serviceAgreementStorage.getServiceAgreementConsumer(serviceId) == msg.sender, 'Only consumer can trigger lockPayment.');
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.lockPayment.selector);
 
         if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition))
@@ -66,7 +66,7 @@ contract Payments {
     }
 
     function releasePayment(bytes32 serviceId, bytes32 assetId, uint256 price) public returns (bool) {
-        require(serviceAgreementStorage.getAgreementOwner(serviceId) == msg.sender, 'Only service provider can trigger releasePayment.');
+        require(serviceAgreementStorage.getAgreementPublisher(serviceId) == msg.sender, 'Only service agreement publisher can trigger releasePayment.');
         bytes32 condition = serviceAgreementStorage.getConditionByFingerprint(serviceId, address(this), this.releasePayment.selector);
         if (serviceAgreementStorage.hasUnfulfilledDependencies(serviceId, condition))
             return false;

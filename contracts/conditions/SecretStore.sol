@@ -11,7 +11,7 @@ contract SecretStore {
     event AccessGranted(bytes32 serviceId, bytes32 asset);
 
     modifier onlySLAPublisher(bytes32 serviceId, address publisher) {
-        require(serviceAgreementStorage.getAgreementOwner(serviceId) == publisher, 'Restricted access - only SLA publisher');
+        require(serviceAgreementStorage.getAgreementPublisher(serviceId) == publisher, 'Restricted access - only SLA publisher');
         _;
     }
 

@@ -9,6 +9,7 @@ const utils = require('./utils.js')
 
 const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
+const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
 
 contract('PaymentConditions', (accounts) => {
     describe('Tests payment conditions used in SLAs', () => {
@@ -26,8 +27,6 @@ contract('PaymentConditions', (accounts) => {
         let fingerprints
         let dependencies
         let hashes
-        let DID
-        let serviceDefinitionId
 
         const timeouts = [0, 0, 0]
 
@@ -78,39 +77,33 @@ contract('PaymentConditions', (accounts) => {
             const releasePaymentHash = utils.valueHash(['bytes32', 'uint256'], [asset, price])
             const grantAccessHash = utils.valueHash(['bytes32', 'bytes32'], [asset, asset])
 
-            DID = '0x315f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
-            serviceDefinitionId = '0x515f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b894'
-
             hashes = [grantAccessHash, lockPaymentHash, releasePaymentHash]
+        })
 
+        async function signAgreement(serviceAgreementId) {
             const hash = utils.createSLAHash(
                 web3, templateId,
                 utils.generateConditionsKeys(templateId, contracts, fingerprints),
                 hashes,
                 timeouts,
-                serviceDefinitionId,
-                DID
+                serviceAgreementId
             )
-
             signature = await web3.eth.sign(hash, consumer)
-        })
-
-        async function signAgreement() {
             const result = await agreement.executeAgreement(
                 templateId,
                 signature,
                 consumer,
                 hashes,
                 timeouts,
-                serviceDefinitionId,
-                DID
+                serviceAgreementId,
+                did
             )
 
-            return result.logs[3].args.serviceId
+            return result.logs[3].args.serviceAgreementId
         }
 
         it('Rejects to lock payments if conditions are not met', async () => {
-            const serviceId = await signAgreement()
+            const serviceId = await signAgreement(utils.generateId(web3))
 
             await paymentConditions.lockPayment(serviceId, asset, price)
             assert.strictEqual(
@@ -120,7 +113,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Locks payment if conditions are met', async () => {
-            const serviceId = await signAgreement()
+            const serviceId = await signAgreement(utils.generateId(web3))
 
             await accessConditions.grantAccess(
                 serviceId,
@@ -137,7 +130,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Does not lock twice', async () => {
-            const serviceId = await signAgreement()
+            const serviceId = await signAgreement(utils.generateId(web3))
 
             await accessConditions.grantAccess(
                 serviceId,
@@ -161,7 +154,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Rejects to release payment if conditions are not met', async () => {
-            const serviceId = await signAgreement()
+            const serviceId = await signAgreement(utils.generateId(web3))
 
             await paymentConditions.releasePayment(serviceId, asset, price)
             assert.strictEqual(
@@ -171,7 +164,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Releases payment if conditions are met', async () => {
-            const serviceId = await signAgreement()
+            const serviceId = await signAgreement(utils.generateId(web3))
 
             await accessConditions.grantAccess(
                 serviceId,
@@ -190,7 +183,7 @@ contract('PaymentConditions', (accounts) => {
         })
 
         it('Does not release twice', async () => {
-            const serviceId = await signAgreement()
+            const serviceId = await signAgreement(utils.generateId(web3))
 
             await accessConditions.grantAccess(
                 serviceId,

@@ -19,6 +19,10 @@ const utils = {
         `0x${abi.soliditySHA3(['string'], [domain]).toString('hex')}`
     ),
 
+    generateId: (web3) => {
+        return web3.utils.sha3(Math.random().toString())
+    },
+
     as: (actor, fn, ...args) => {
         function detectSendObject(potentialSendObj) {
             function hasOwnProperty(obj, prop) {
@@ -97,14 +101,13 @@ const utils = {
         return conditions
     },
 
-    createSLAHash: (web3, slaTemplateId, conditionsKeys, hashes, timeouts, serviceDefinition, did) => {
+    createSLAHash: (web3, slaTemplateId, conditionsKeys, hashes, timeouts, serviceAgreementId) => {
         return web3.utils.soliditySha3(
             { type: 'bytes32', value: slaTemplateId },
             { type: 'bytes32[]', value: conditionsKeys },
             { type: 'bytes32[]', value: hashes },
             { type: 'uint256[]', value: timeouts },
-            { type: 'bytes32', value: serviceDefinition },
-            { type: 'bytes32', value: did }
+            { type: 'bytes32', value: serviceAgreementId }
         ).toString('hex')
     },
 
@@ -133,21 +136,21 @@ const utils = {
         return '0x' + abi.soliditySHA3(types, values).toString('hex')
     },
 
-    signAgreement: async (agreement, templateId, signature, consumer, hashes, timeouts, serviceDefinitionId, did, args = {}) => {
+    signAgreement: async (agreement, templateId, signature, consumer, hashes, timeouts, serviceAgreementId, did, args = {}) => {
         const result = await agreement.executeAgreement(
             templateId,
             signature,
             consumer,
             hashes,
             timeouts,
-            serviceDefinitionId,
+            serviceAgreementId,
             did,
             args
         )
 
         return result.logs.filter((log) => {
             return log.event === 'ExecuteAgreement'
-        })[0].args.serviceId
+        })[0].args.serviceAgreementId
     },
     sleep: (millis) => {
         return new Promise(resolve => setTimeout(resolve, millis))

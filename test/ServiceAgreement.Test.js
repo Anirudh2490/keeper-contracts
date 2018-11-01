@@ -87,6 +87,7 @@ contract('SLA', (accounts) => {
             const dependencies = [536, 192, 0, 320]
 
             const serviceTemplateId = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
+            const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
             const contracts = [contract1, contract2, contract3, contract4]
             const fingerprints = [fingerprint1, fingerprint2, fingerprint3, fingerprint4]
             // setup service level agreement template
@@ -126,15 +127,12 @@ contract('SLA', (accounts) => {
             */
 
             // generate template fingerprint including all the conditions and
-            const DID = '0x315f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
-            const serviceDefinitionId = '0x515f158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b894'
-            const hash = utils.createSLAHash(web3, templateId, condKeys, valHashList, timeoutValues, serviceDefinitionId, DID)
+            const serviceAgreementId = utils.generateId(web3)
+            const hash = utils.createSLAHash(web3, templateId, condKeys, valHashList, timeoutValues, serviceAgreementId)
             const signature = await web3.eth.sign(hash, consumer)
-            const val = await sla.executeAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, serviceDefinitionId, DID, { from: SLATemplateOwner })
+            const val = await sla.executeAgreement(templateId, signature, consumer, [ valHashList[0], valHashList[1], valHashList[2], valHashList[3] ], timeoutValues, serviceAgreementId, did, { from: SLATemplateOwner })
             assert.strictEqual(val.logs[4].args.state, true, 'Execute Agreement should return true')
-            console.log('\x1b[36m%s\x1b[0m', '\t >> Service Agreement ID: ', val.logs[4].args.serviceId, ' ... Done!')
-
-            const serviceAgreementId = val.logs[4].args.serviceId
+            console.log('\x1b[36m%s\x1b[0m', '\t >> Service Agreement ID: ', val.logs[4].args.serviceAgreementId, ' ... Done!')
 
             console.log('\x1b[36m%s\x1b[0m', '\t >> Set 3rd condition status to 1 by contract address: ', contract3, ' Fingerprint: ', fingerprint3)
             console.log('\t >> Reconstruct condition-3 authorized hash')
