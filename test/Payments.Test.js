@@ -1,8 +1,8 @@
 /* global assert, artifacts, contract, before, describe, it */
 
-const AccessConditions = artifacts.require('SecretStore.sol')
-const OceanToken = artifacts.require('OCNToken.sol')
-const PaymentConditions = artifacts.require('Payments.sol')
+const SecretStore = artifacts.require('SecretStore.sol')
+const OCNToken = artifacts.require('OCNToken.sol')
+const Payments = artifacts.require('Payments.sol')
 const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
 
 const utils = require('./utils.js')
@@ -38,21 +38,21 @@ contract('PaymentConditions', (accounts) => {
         var walletBalance = 0
 
         before(async () => {
-            token = await OceanToken.new()
+            token = await OCNToken.new()
 
             await token.setReceiver(consumer)
             await token.approve(consumer, await token.totalSupply.call())
 
             agreement = await ServiceAgreement.new()
 
-            paymentConditions = await PaymentConditions.new(
+            paymentConditions = await Payments.new(
                 agreement.address, token.address
             )
             await token.approve(paymentConditions.address, walletAllowance)
 
             // Setup an agreement template where lockPayment depends on grantAccess,
             // releasePayment depends on lockPayment.
-            accessConditions = await AccessConditions.new(agreement.address)
+            accessConditions = await SecretStore.new(agreement.address)
             contracts = [
                 accessConditions.address,
                 paymentConditions.address,

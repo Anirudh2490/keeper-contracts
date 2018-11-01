@@ -11,7 +11,7 @@ const market = async (deployer, network) => {
         tokenAddress
     )
 
-    saveDefinition(network, OceanMarket)
+    saveDefinition(network, Market)
 }
 
 module.exports = market

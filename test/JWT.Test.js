@@ -1,9 +1,9 @@
 /* global artifacts, assert, contract, describe, it */
 /* eslint-disable no-console, max-len */
 
-const OceanToken = artifacts.require('OCNToken.sol')
-const OceanMarket = artifacts.require('Market.sol')
-const OceanAuth = artifacts.require('Jwt.sol')
+const OCNToken = artifacts.require('OCNToken.sol')
+const Market = artifacts.require('Market.sol')
+const Jwt = artifacts.require('Jwt.sol')
 
 const ursa = require('ursa')
 const ethers = require('ethers')
@@ -17,9 +17,9 @@ contract('Jwt', (accounts) => {
         // support upto 50 assets and providers; each asset has one single provider at this time
         it('Should walk through Authorization Process', async () => {
             // const marketPlace = await Market.deployed();
-            const token = await OceanToken.deployed()
-            const market = await OceanMarket.deployed()
-            const auth = await OceanAuth.deployed()
+            const token = await OCNToken.deployed()
+            const market = await Market.deployed()
+            const auth = await Jwt.deployed()
             const scale = 10 ** 18
 
             const str = 'resource'

@@ -1,8 +1,8 @@
 /* global artifacts, contract, before, describe, it */
 /* eslint-disable no-console, max-len */
 
-const OceanToken = artifacts.require('OCNToken.sol')
-const OceanMarket = artifacts.require('Market.sol')
+const OCNToken = artifacts.require('OCNToken.sol')
+const Market = artifacts.require('Market.sol')
 const SLA = artifacts.require('ServiceAgreement.sol')
 const PaymentCtrl = artifacts.require('Payments.sol')
 const AccessCtrl = artifacts.require('SecretStore.sol')
@@ -27,9 +27,9 @@ contract('ServiceAgreement', (accounts) => {
         const dependencies = [0, 1, 4, 1 | 2 ** 4 | 2 ** 5] // dependency bit | timeout bit
         const did = '0x319d158c3a5d81d15b0160cf8929916089218bdb4aa78c3ecd16633afd44b8ae'
         before(async () => {
-            token = await OceanToken.new()
+            token = await OCNToken.new()
             // await token.setReceiver(consumer)
-            market = await OceanMarket.new(token.address)
+            market = await Market.new(token.address)
             sla = await SLA.new()
             paymentConditions = await PaymentCtrl.new(sla.address, token.address)
             accessConditions = await AccessCtrl.new(sla.address)

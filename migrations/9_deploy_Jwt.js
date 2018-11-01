@@ -9,7 +9,7 @@ const jwt = async (deployer, network) => {
         Market.address
     )
 
-    saveDefinition(network, OceanAuth)
+    saveDefinition(network, Jwt)
 }
 
 module.exports = jwt
