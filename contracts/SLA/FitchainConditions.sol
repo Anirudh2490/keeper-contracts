@@ -1,5 +1,7 @@
 pragma solidity ^0.4.24;
 
+import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
+
 /**
 @title Ocean-Fitchain Driver Contract
 @author  Ahmed Ali
@@ -44,35 +46,6 @@ contract FitchainConditions {
         Model memory m = Model(false, k, consumer, mlProvider, dataProvider, bytes32(0), service, bytes32(0));
         models[condition] = m;
         emit InvokeFitchainPoT(condition, consumer, mlProvider, dataProvider, mlAsset, dataAsset);
-    }
-
-    function splitSignature(bytes memory sig, uint256  index) internal pure returns (uint8 v, bytes32 r, bytes32 s) {
-        uint256 maxLength = (index+1) * 65;
-        uint256 rIndex  = (index * 96 ) + 32;
-        uint256 sIndex  = (index * 96 ) + rIndex + 32;
-        uint256 vIndex  = (index * 96 ) + sIndex + 32;
-        require(sig.length == maxLength);
-        // inline assembly code for splitting signature into r, v , and s.
-        assembly {
-            // first 32 bytes, after the length prefix
-            r := mload(add(sig, rIndex))
-            // second 32 bytes
-            s := mload(add(sig, sIndex))
-            // final byte (first byte of the next 32 bytes)
-            v := byte(0, mload(add(sig, vIndex)))
-        }
-
-        if (v < 27) {
-             v += 27;
-         }
-
-        return (v, r, s);
-    }
-
-
-    function getSignerAddress(bytes32 message, bytes memory signature, uint256 index) private pure returns (address) {
-        (uint8 v, bytes32 r, bytes32 s) = splitSignature(signature, index);
-        return ecrecover(message, v, r, s);
     }
 
     function isValidSignature(bytes32 message, address validator, bytes memory signature, uint256 index) public pure returns (bool) {
