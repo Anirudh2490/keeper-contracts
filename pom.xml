@@ -4,7 +4,7 @@
   <groupId>com.oceanprotocol</groupId>
   <artifactId>keeper-contracts</artifactId>
   <packaging>jar</packaging>
-  <version>0.3.23</version>
+  <version>0.4.0</version>
   <name>Keeper Contracts</name>
   <description>Integration of TCRs, CPM and Ocean Tokens in Solidity</description>
   <url>https://github.com/oceanprotocol/keeper-contracts</url>
@@ -20,7 +20,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
-    <web3j.version>3.6.0</web3j.version>
+    <web3j.version>4.0.1</web3j.version>
   </properties>
   <developers>
     <developer>

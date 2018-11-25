@@ -104,6 +104,11 @@ contract ServiceAgreement {
         _;
     }
 
+    modifier onlyExistConditionKey(bytes32 serviceAgreementId, bytes32 condition){
+        require(templates[agreements[serviceAgreementId].templateId].conditionKeys[conditionKeyToIndex[condition]] == condition, 'Invalid condition key');
+        _;
+    }
+
     // events
     event SetupCondition(bytes32 serviceTemplate, bytes32 condition, address provider);
     event SetupAgreementTemplate(bytes32 serviceTemplateId, address provider);
@@ -265,7 +270,7 @@ contract ServiceAgreement {
         return block.number;
     }
 
-    function getConditionStatus(bytes32 serviceId, bytes32 condition) public view returns (uint8){
+    function getConditionStatus(bytes32 serviceId, bytes32 condition) public onlyExistConditionKey(serviceId, condition) view returns (uint8){
         return agreements[serviceId].conditionsState[conditionKeyToIndex[condition]];
     }
 

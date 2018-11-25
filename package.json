@@ -1,6 +1,6 @@
 {
   "name": "@oceanprotocol/keeper-contracts",
-  "version": "0.3.23",
+  "version": "0.4.0",
   "description": "Integration of TCRs, CPM and Ocean Tokens in Solidity",
   "bugs": {
     "url": "https://github.com/oceanprotocol/keeper-contracts/issues"
@@ -54,7 +54,7 @@
     "eth-ecies": "^1.0.3",
     "ethereumjs-abi": "^0.6.5",
     "ethereumjs-util": "^6.0.0",
-    "ethers": "^4.0.12",
+    "ethers": "^4.0.13",
     "ethjs": "^0.4.0",
     "ethjs-abi": "^0.2.1",
     "ethjs-provider-http": "^0.1.6",
@@ -65,7 +65,7 @@
     "truffle": "^5.0.0-user-level-mnemonic.0",
     "truffle-config": "^1.0.4",
     "truffle-expect": "0.0.4",
-    "truffle-hdwallet-provider": "^1.0.0-web3one.1",
+    "truffle-hdwallet-provider": "^1.0.0-web3one.2",
     "web3": "1.0.0-beta.36",
     "web3-eth-abi": "^1.0.0-beta.36",
     "web3-utils": "^1.0.0-beta.36"

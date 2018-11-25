@@ -1,4 +1,4 @@
-FROM node:8-alpine
+FROM node:10-alpine
 LABEL maintainer="Ocean Protocol <devops@oceanprotocol.com>"
 
 RUN apk add --no-cache --update\
@@ -16,7 +16,7 @@ COPY . /keeper-contracts
 WORKDIR /keeper-contracts
 
 RUN npm install -g npm
-RUN npm install -g ganache-cli
+RUN npm install -g ganache-cli@~6.1.8
 RUN npm install
 
 # Default ENV values

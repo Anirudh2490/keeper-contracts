@@ -2,6 +2,8 @@
 
 [ "${LOCAL_CONTRACTS}" = "true" ] && rm -f /keeper-contracts/artifacts/ready
 
+npm run clean
+
 if [ "${NETWORK_NAME}" = "kovan" ]
 then
     parity --chain=kovan \

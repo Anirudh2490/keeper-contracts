@@ -37,7 +37,7 @@ before_install:
       sudo apt-get install oracle-java8-set-default maven
       java -version
       mvn -version
-      export WEB3J_VERSION=3.6.0
+      export WEB3J_VERSION=4.0.1
       curl -L -o web3j-${WEB3J_VERSION}.tar https://github.com/web3j/web3j/releases/download/v${WEB3J_VERSION}/web3j-${WEB3J_VERSION}.tar
       tar xf web3j-${WEB3J_VERSION}.tar
       ls -la
