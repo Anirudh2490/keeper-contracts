@@ -35,6 +35,29 @@ contract ServiceAgreement {
         bytes32 did; // Decentralized Identifier
     }
 
+    // record the provider of data commons - Fang
+    address[] lotteryCandidates;
+
+    // returns full list of candidate addresses - Fang
+    function getCandidateList() public view returns (address[]) {
+        address[] memory v = new address[](lotteryCandidates.length);
+        for (uint256 i = 0; i < lotteryCandidates.length; i++) {
+            v[i] = lotteryCandidates[i];
+        }
+        return v;
+    }
+
+    // return number of candidates at this time - Fang
+    function getCount() public view returns (uint256) {
+        return lotteryCandidates.length;
+    }
+
+    // return specific candidate by index - Fang
+    function getCandidate(uint256 index) public view returns (address) {
+        return lotteryCandidates[index];
+    }
+
+
     mapping(bytes32 => ServiceAgreementTemplate) templates;
     // instances of SLA template
     mapping(bytes32 => Agreement) agreements;
@@ -101,11 +124,6 @@ contract ServiceAgreement {
 
     modifier isValidTemplateId(bytes32 templateId) {
         require(!templates[templateId].state, 'Template ID already exists');
-        _;
-    }
-
-    modifier onlyExistConditionKey(bytes32 serviceAgreementId, bytes32 condition){
-        require(templates[agreements[serviceAgreementId].templateId].conditionKeys[conditionKeyToIndex[condition]] == condition, 'Invalid condition key');
         _;
     }
 
@@ -193,6 +211,9 @@ contract ServiceAgreement {
     function fulfillAgreement(bytes32 serviceId) public noPendingFulfillments(serviceId) returns (bool){
         agreements[serviceId].state = true;
         agreements[serviceId].terminated = true;
+        // log the provider who fulfill this SA - Fang
+        lotteryCandidates.push(agreements[serviceId].publisher);
+        // send out event message
         emit AgreementFulfilled(serviceId, agreements[serviceId].templateId, templates[agreements[serviceId].templateId].owner);
         return true;
     }
@@ -270,7 +291,7 @@ contract ServiceAgreement {
         return block.number;
     }
 
-    function getConditionStatus(bytes32 serviceId, bytes32 condition) public onlyExistConditionKey(serviceId, condition) view returns (uint8){
+    function getConditionStatus(bytes32 serviceId, bytes32 condition) public view returns (uint8){
         return agreements[serviceId].conditionsState[conditionKeyToIndex[condition]];
     }
 

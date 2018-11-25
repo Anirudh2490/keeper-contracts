@@ -18,24 +18,40 @@ contract OceanToken is ERC20 {
     string public constant name = 'OceanToken';                      // Set the token name for display
     string public constant symbol = 'OCN';                           // Set the token symbol for display
 
-    // SUPPLY
-    uint8 public constant decimals = 18;                             // Set the number of decimals for display
-    uint256 public constant TOTAL_SUPPLY = 1400000000 * 10 ** 18;    // OceanToken total supply
-
-    // EMIT TOKENS
+    // initial receiver of tokens
     address public _receiver = address(0);                           // address to receive TOKENS
-    uint256 public totalSupply;                                      // total supply of Ocean tokens including initial tokens plus block rewards
+    address public _rewardPool = address(0);
+
+    // constants
+    uint8 public constant decimals = 18;                             // Set the number of decimals for display
+    uint256 public totalSupply = 1400000000 * 10 ** 18;    // OceanToken total supply
+    uint256 public currentSupply = totalSupply.mul(40).div(100);    // current available tokens
+
+    // network reward parameters
+    uint256 public rewardSupply = totalSupply.sub(currentSupply);   // token amount for rewards
+    uint256 public halfLife = 30;                                   // number of blocks for half-life
+    uint256 public rateLimiter = 0;                                 // need to wait for 5 blocks to mint new tokens
+    uint256 public threshold = 1000 * 10 ** 18;                     // trigger distribution of rewards if amountReward > threshold
+    uint256 public initBlockNum;
+    uint256 public lastMintBlock;
+    uint256 public amountReward = 0;
+
+    // Events
+    event tokenMinted(address indexed _miner, uint256 _amount, bool _status);
 
     /**
     * @dev OceanToken Constructor
     * Runs only on initial contract creation.
     */
     constructor() public {
-        totalSupply = TOTAL_SUPPLY;
+        // log init block number
+        initBlockNum = block.number;
+        // log last mining block
+        lastMintBlock = block.number;
     }
 
     /**
-    * @dev setReceiver set the address to receive the emitted tokens
+    * @dev setReceiver set the address (OeanMarket) to receive the emitted tokens
     * @param _to The address to send tokens
     * @return success setting is successful.
     */
@@ -43,10 +59,58 @@ contract OceanToken is ERC20 {
         // make sure receiver is not set already
         require(_receiver == address(0), 'Receiver address already set.');
         // Creator address is assigned initial available tokens
-        super._mint(_to, TOTAL_SUPPLY);
+        super._mint(_to, currentSupply);
         // set receiver
         _receiver = _to;
         return true;
+    }
+
+    /**
+    * @dev setRewardPool set the address (OceanReward) to receive the reward tokens
+    * @param _to The address to send tokens
+    * @return success setting is successful.
+    */
+    function setRewardPool(address _to) public returns (bool success){
+        // make sure receiver is not set already
+        require(_rewardPool == address(0), 'reward pool address already set.');
+        // set _rewardPool
+        _rewardPool = _to;
+        return true;
+    }
+
+    /**
+     * @dev emitTokens Ocean tokens according to schedule forumla
+     * @return true if the mining of Ocean tokens is successful.
+     */
+    function mintTokens() public returns (bool success) {
+      // check if all tokens have been minted
+      if (currentSupply == totalSupply){
+        emit tokenMinted(msg.sender, 0, false);
+        return false;
+      }
+
+      require(block.number > initBlockNum, 'block.number < initi block number');
+      uint256 tH = (block.number.sub(initBlockNum)).div( halfLife );   // half-life is 30 blocks: release 50% after 30 blocks (testing!)
+      uint256 base = 2 ** tH;
+      uint256 supply = rewardSupply.sub(rewardSupply.div(base));
+
+      require(supply >= amountReward, 'tokenToMint is negative');
+      uint256 tokenToMint = supply.sub(amountReward);
+      if (tokenToMint == 0) {
+          emit tokenMinted(msg.sender, 0, false);
+          return false;
+      }
+
+      // mint new tokens and deposit in OceanReward contract
+      super._mint(_rewardPool, tokenToMint);
+      // log the block number
+      lastMintBlock = block.number;
+      // update current token reward amount
+      amountReward = amountReward.add(tokenToMint);
+      // update current token supply
+      currentSupply = currentSupply.add(tokenToMint);
+      emit tokenMinted(msg.sender, tokenToMint, true);
+      return true;
     }
 
     /**
