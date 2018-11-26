@@ -1,31 +1,142 @@
-/* global artifacts, assert, contract, describe, it */
+/* global artifacts, contract, describe, it */
 /* eslint-disable no-console, max-len */
 
 const OceanToken = artifacts.require('OceanToken.sol')
 const OceanMarket = artifacts.require('OceanMarket.sol')
-const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
-const AccessConditions = artifacts.require('AccessConditions.sol')
+// const ServiceAgreement = artifacts.require('ServiceAgreement.sol')
+// const AccessConditions = artifacts.require('AccessConditions.sol')
 const OceanReward = artifacts.require('OceanReward.sol')
 
-const EthEcies = require('eth-ecies')
-const EthCrypto = require('eth-crypto')
-const EthjsUtil = require('ethereumjs-util')
-const ethers = require('ethers')
-const BigNumber = require('bignumber.js')
 const utils = require('./utils.js')
 
 const web3 = utils.getWeb3()
 
-function wait(ms) {
-    const start = new Date().getTime()
-    let end = start
-    while (end < start + ms) {
-        end = new Date().getTime()
-    }
-}
-
-contract('OceanToken', (accounts) => {
+contract('OceanReward', (accounts) => {
     describe('Test Block Reward', () => {
+        it('Should reward based on validation', async () => {
+            const token = await OceanToken.deployed()
+            const reward = await OceanReward.deployed()
+            const market = await OceanMarket.deployed(token.address)
+            const scale = 10 ** 18
+
+            // request initial fund
+            await market.requestTokens(0, { from: accounts[0] })
+            let bal0 = await token.balanceOf.call(accounts[0])
+            await token.approve(reward.address, bal0, { from: accounts[0] })
+
+            await market.requestTokens(0, { from: accounts[1] })
+            let bal1 = await token.balanceOf.call(accounts[1])
+            await token.approve(reward.address, bal1, { from: accounts[1] })
+
+            await market.requestTokens(0, { from: accounts[2] })
+            let bal2 = await token.balanceOf.call(accounts[2])
+            await token.approve(reward.address, bal2, { from: accounts[2] })
+
+            await market.requestTokens(0, { from: accounts[3] })
+            let bal3 = await token.balanceOf.call(accounts[3])
+            await token.approve(reward.address, bal3, { from: accounts[3] })
+
+            await market.requestTokens(0, { from: accounts[5] })
+            let bal5 = await token.balanceOf.call(accounts[5])
+            await token.approve(reward.address, bal5, { from: accounts[5] })
+
+            console.log(`----- first submission ------- `)
+            // create first submission
+            let submissionHash = utils.generateId(web3)
+            let dataHash = utils.generateId(web3)
+            let modelHash = utils.generateId(web3)
+            // when amount == 0, default stake amount is 100 tokens
+            await reward.submit(submissionHash, dataHash, modelHash, 0, { from: accounts[0] })
+            console.log(`explorer submits:`)
+            console.log(`\t dataset ${dataHash}`)
+            console.log(`\t model ${modelHash}`)
+            console.log(`\t submission hash = ${submissionHash}.`)
+            console.log(`\t stake = 100 tokens.`)
+
+            console.log(``)
+            await reward.registVerifier(submissionHash, { from: accounts[1] })
+            await reward.registVerifier(submissionHash, { from: accounts[2] })
+            await reward.registVerifier(submissionHash, { from: accounts[3] })
+            console.log(`user 1, 2, 3 regist as verifiers for this submission`)
+
+            // when amount == 0, default stake amount is 100 tokens
+            await reward.submitVote(submissionHash, false, 0, { from: accounts[1] })
+            await reward.submitVote(submissionHash, true, 0, { from: accounts[2] })
+            await reward.submitVote(submissionHash, true, 0, { from: accounts[3] })
+            console.log(`user 1, 2, 3 submit votes (false, true, true) with 100 tokens as stakes`)
+
+            await reward.resolve(submissionHash, { from: accounts[0] })
+            console.log(`resolve the voting for this submission`)
+
+            await reward.handleStakes(submissionHash, { from: accounts[0] })
+            console.log(`process stakes for this submission`)
+
+            // create second submission
+            console.log(`----- second submission ------- `)
+            submissionHash = utils.generateId(web3)
+            dataHash = utils.generateId(web3)
+            modelHash = utils.generateId(web3)
+            await reward.submit(submissionHash, dataHash, modelHash, 0, { from: accounts[5] })
+            console.log(`explorer submits:`)
+            console.log(`\t dataset ${dataHash}`)
+            console.log(`\t model ${modelHash}`)
+            console.log(`\t submission hash = ${submissionHash}.`)
+            console.log(`\t stake = 100 tokens.`)
+
+            console.log(``)
+            await reward.registVerifier(submissionHash, { from: accounts[1] })
+            await reward.registVerifier(submissionHash, { from: accounts[2] })
+            await reward.registVerifier(submissionHash, { from: accounts[3] })
+            console.log(`user 1, 2, 3 regist as verifiers for this submission`)
+
+            await reward.submitVote(submissionHash, true, 0, { from: accounts[1] })
+            await reward.submitVote(submissionHash, true, 0, { from: accounts[2] })
+            await reward.submitVote(submissionHash, false, 0, { from: accounts[3] })
+            console.log(`user 1, 2, 3 submit votes (true, true, false) with 100 tokens as stakes`)
+
+            await reward.resolve(submissionHash, { from: accounts[5] })
+            console.log(`resolve the voting for this submission`)
+
+            await reward.handleStakes(submissionHash, { from: accounts[5] })
+            console.log(`process stakes for this submission`)
+
+            console.log(``)
+            console.log(`----- distribute reward tokens ------- `)
+            // print candidate list
+            let array = await reward.getCandidateList({ from: accounts[0] })
+            console.log(`explorer with lottery ticket:=`)
+            console.log(array)
+
+            // mint tokens
+            let i = 0
+            for (i = 0; i < 30; i++) {
+                await token.mintTokens({ from: accounts[0] })
+            }
+
+            let amount = await reward.getRewardAmount.call({ from: accounts[0] })
+            let blocknumber = await web3.eth.getBlockNumber()
+            console.log(`block ${blocknumber} reward pool has := ${amount.valueOf() / scale} Ocean tokens now.`)
+
+            await reward.sendRewards({ from: accounts[0] })
+            console.log(`successfully send rewards`)
+            // print reward info
+            let winner = await reward.getWinnerAmount({ from: accounts[0] })
+            console.log(`winner of token reward is:= ${winner[0]} and amount := ${winner[1] / scale}`)
+            const bal = await token.balanceOf.call(winner[0])
+            console.log(`winner has token balance := ${bal / scale} now`)
+
+            bal1 = await token.balanceOf.call(accounts[1])
+            console.log(`voter 1 has ${bal1.valueOf() / scale} tokens.`)
+
+            bal1 = await token.balanceOf.call(accounts[2])
+            console.log(`voter 2 has ${bal1.valueOf() / scale} tokens.`)
+
+            bal1 = await token.balanceOf.call(accounts[3])
+            console.log(`voter 3 has ${bal1.valueOf() / scale} tokens.`)
+        })
+    })
+    /*
+        // test distribution of network rewards based on SA fulfillment
         it('Should fulfill access SA', async () => {
           let publisher = accounts[0]
           const datascientist = accounts[1]
@@ -63,7 +174,6 @@ contract('OceanToken', (accounts) => {
           )
           templateId = utils.getEventArgsFromTx(createAgreementTemplate, 'SetupAgreementTemplate').serviceTemplateId
           // create new agreement instance
-
 
           conditionKeys = utils.generateConditionsKeys(templateId, contracts, funcFingerPrints)
           slaMsgHash = utils.createSLAHash(web3, templateId, conditionKeys, valuesHashList, timeouts, serviceAgreementId)
@@ -122,7 +232,6 @@ contract('OceanToken', (accounts) => {
           await serviceAgreement.fulfillAgreement(serviceAgreementId, { from: publisher })
           console.log(`[2] ${publisher} fulfills service agreement ${serviceAgreementId}`)
           await serviceAgreement.isAgreementTerminated(serviceAgreementId, { from: publisher })
-
 
           // third  SA fulfillment
           publisher = accounts[3]
@@ -187,12 +296,10 @@ contract('OceanToken', (accounts) => {
           console.log(`winner of token reward is:= ${winner}`)
           const bal = await token.balanceOf.call(winner)
           console.log(`winner has token balance := ${bal.valueOf() / scale} now`)
-
-
         })
     })
 
-/*
+      // Only test mining tokens
         it('Should mint tokens as scheduled', async () => {
           const token = await OceanToken.deployed()
           const market = await OceanMarket.deployed()
@@ -214,8 +321,5 @@ contract('OceanToken', (accounts) => {
           }
         })
     })
-
-*/
-
-
+  */
 })

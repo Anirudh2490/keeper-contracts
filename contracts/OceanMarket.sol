@@ -168,15 +168,24 @@ contract OceanMarket is Ownable {
 
     /**
     * @dev user can request some tokens for testing
-    * @param amount the amount of tokens to be requested
+    * @param _amount the amount of tokens to be requested
     * @return valid Boolean indication of tokens are requested
     */
-    function requestTokens(uint256 amount) public validAddress(msg.sender) returns (bool) {
+    function requestTokens(uint256 _amount) public validAddress(msg.sender) returns (bool) {
         /* solium-disable-next-line security/no-block-members */
         if (block.timestamp < tokenRequest[msg.sender] + minPeriod) {
             emit FrequentTokenRequest(msg.sender, minPeriod);
             return false;
         }
+
+        // testing only
+        uint256 amount = 0;
+        if (_amount == 0){
+            amount = 1000 * 10 ** 18;
+        } else {
+            amount = _amount;
+        }
+
         // amount should not exceed maxAmount
         if (amount > maxAmount) {
             require(mToken.transfer(msg.sender, maxAmount), 'Token transfer failed.');

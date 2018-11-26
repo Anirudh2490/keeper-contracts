@@ -83,34 +83,34 @@ contract OceanToken is ERC20 {
      * @return true if the mining of Ocean tokens is successful.
      */
     function mintTokens() public returns (bool success) {
-      // check if all tokens have been minted
-      if (currentSupply == totalSupply){
-        emit tokenMinted(msg.sender, 0, false);
-        return false;
+        // check if all tokens have been minted
+        if (currentSupply == totalSupply){
+            emit tokenMinted(msg.sender, 0, false);
+            return false;
       }
 
-      require(block.number > initBlockNum, 'block.number < initi block number');
-      uint256 tH = (block.number.sub(initBlockNum)).div( halfLife );   // half-life is 30 blocks: release 50% after 30 blocks (testing!)
-      uint256 base = 2 ** tH;
-      uint256 supply = rewardSupply.sub(rewardSupply.div(base));
+        require(block.number > initBlockNum, 'block.number < initi block number');
+        uint256 tH = (block.number.sub(initBlockNum)).div( halfLife );   // half-life is 30 blocks: release 50% after 30 blocks (testing!)
+        uint256 base = 2 ** tH;
+        uint256 supply = rewardSupply.sub(rewardSupply.div(base));
 
-      require(supply >= amountReward, 'tokenToMint is negative');
-      uint256 tokenToMint = supply.sub(amountReward);
-      if (tokenToMint == 0) {
-          emit tokenMinted(msg.sender, 0, false);
-          return false;
-      }
+        require(supply >= amountReward, 'tokenToMint is negative');
+        uint256 tokenToMint = supply.sub(amountReward);
+        if (tokenToMint == 0) {
+            emit tokenMinted(msg.sender, 0, false);
+            return false;
+        }
 
-      // mint new tokens and deposit in OceanReward contract
-      super._mint(_rewardPool, tokenToMint);
-      // log the block number
-      lastMintBlock = block.number;
-      // update current token reward amount
-      amountReward = amountReward.add(tokenToMint);
-      // update current token supply
-      currentSupply = currentSupply.add(tokenToMint);
-      emit tokenMinted(msg.sender, tokenToMint, true);
-      return true;
+        // mint new tokens and deposit in OceanReward contract
+        super._mint(_rewardPool, tokenToMint);
+        // log the block number
+        lastMintBlock = block.number;
+        // update current token reward amount
+        amountReward = amountReward.add(tokenToMint);
+        // update current token supply
+        currentSupply = currentSupply.add(tokenToMint);
+        emit tokenMinted(msg.sender, tokenToMint, true);
+        return true;
     }
 
     /**
